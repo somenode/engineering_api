@@ -1,0 +1,6 @@
+name = Engineering RESTful API
+description = Engineering content resources
+core = 7.x
+dependencies[] = restful
+
+registry_autoload[] = PSR-4
