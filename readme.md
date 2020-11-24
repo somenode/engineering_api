@@ -89,6 +89,9 @@ class Research__1_0 extends ResourceEntity implements ResourceInterface {
 }
 ```
 
+<br>
+<br>
+
 ### After defining a custom taxonomy plugin, use it in your resource.
 
 ```
@@ -252,6 +255,9 @@ class News__1_1 extends News__1_0 implements ResourceInterface {
 }
 ```
 
+<br>
+<br>
+
 #### Snippet of JSON response after adding taxonomy plugin
 
 ```
@@ -280,6 +286,9 @@ class News__1_1 extends News__1_0 implements ResourceInterface {
 	]
 }
 ```
+
+<br>
+<br>
 
 ### Referencing paragraphs
 
@@ -338,8 +347,6 @@ class lede__1_0 extends ResourceEntity implements ResourceInterface {
 
 #### Snippet of JSON response before adding paragraph plugin
 
-<br>
-
 ```
 {
 	"id": 8212,
@@ -352,10 +359,10 @@ class lede__1_0 extends ResourceEntity implements ResourceInterface {
 }
 ```
 
-#### Snippet of JSON response after adding paragraph plugin
+<br>
+<br>
 
-<br>
-<br>
+#### Snippet of JSON response after adding paragraph plugin
 
 ```
 {
