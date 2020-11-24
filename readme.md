@@ -89,11 +89,7 @@ class Research__1_0 extends ResourceEntity implements ResourceInterface {
 }
 ```
 
-<br>
-<br>
-After defining a custom taxonomy plugin, use it in your resource. 
-<br>
-<br>
+### After defining a custom taxonomy plugin, use it in your resource.
 
 ```
 namespace Drupal\engineering_api\Plugin\resource\entity\node\news;
@@ -240,7 +236,7 @@ class News__1_1 extends News__1_0 implements ResourceInterface {
 <br>
 <br>
 
-### Snippet of JSON response before adding taxonomy plugin
+#### Snippet of JSON response before adding taxonomy plugin (full field list above)
 
 <br>
 
@@ -256,10 +252,7 @@ class News__1_1 extends News__1_0 implements ResourceInterface {
 }
 ```
 
-<br>
-### Snippet of JSON response after adding taxonomy plugin
-<br>
-<br>
+#### Snippet of JSON response after adding taxonomy plugin
 
 ```
 {
@@ -288,7 +281,6 @@ class News__1_1 extends News__1_0 implements ResourceInterface {
 }
 ```
 
-<br>
 ### Referencing paragraphs
 
 Use the same approach by defining a custom plugin and using the paragraphs namespace.
@@ -344,7 +336,7 @@ class lede__1_0 extends ResourceEntity implements ResourceInterface {
 <br>
 <br>
 
-### Snippet of JSON response before adding paragraph plugin (see [/src/Plugin/resource/entity/node/news/News\_\_1_1](https://github.com/somenode/engineering_api/blob/master/src/Plugin/resource/entity/node/news/News__1_1.php) for full field list).
+#### Snippet of JSON response before adding paragraph plugin
 
 <br>
 
@@ -360,8 +352,8 @@ class lede__1_0 extends ResourceEntity implements ResourceInterface {
 }
 ```
 
-<br>
-### Snippet of JSON response after adding paragraph plugin
+#### Snippet of JSON response after adding paragraph plugin
+
 <br>
 <br>
 
