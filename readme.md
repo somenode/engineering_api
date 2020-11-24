@@ -91,26 +91,21 @@ class Research__1_0 extends ResourceEntity implements ResourceInterface {
 
 <br>
 <br>
-After defining a custom taxonomy plugin, create a new plugin which will use the newly defined taxonomy resource. 
+After defining a custom taxonomy plugin, use it in your resource. 
 <br>
 <br>
 
 ```
-/**
- * @file
- * Contains \Drupal\engineering_api\Plugin\resource\entity\node\news\News__1_2.
- */
-
 namespace Drupal\engineering_api\Plugin\resource\entity\node\news;
 use Drupal\restful\Plugin\resource\Field\ResourceFieldBase;
 use Drupal\restful\Plugin\resource\ResourceInterface;
 
 /**
- * Class News__1_2
+ * Class News__1_1
  * @package Drupal\engineering_api\Plugin\resource\entity\node\news
  *
  * @Resource(
- *   name = "news:1.2",
+ *   name = "news:1.1",
  *   resource = "news",
  *   label = "News",
  *   description = "School of Engineering and Applied Science news stories.",
@@ -120,39 +115,132 @@ use Drupal\restful\Plugin\resource\ResourceInterface;
  *     "bundles": {
  *       "news"
  *     },
- *     "sort" = {
- *      "publish_date": "DESC",
- *      }
  *   },
  *   majorVersion = 1,
- *   minorVersion = 2
+ *   minorVersion = 1
  * )
  */
-class News__1_2 extends News__1_1 implements ResourceInterface {
+class News__1_1 extends News__1_0 implements ResourceInterface {
 
     /**
      * Overrides ResourceEntity::publicFields().
      */
     protected function publicFields() {
-
         $public_fields = parent::publicFields();
 
-        $public_fields['research']['resource']['name'] = 'research';
-        $public_fields['faculty']['resource']['name'] = 'faculty';
-        $public_fields['department']['resource']['name'] = 'unit';
-        $public_fields['center']['resource']['name'] = 'unit';
-        $public_fields['series']['resource']['name'] = 'series';
-        $public_fields['series']['resource']['name'] = 'eqn';
+        // Rename label
+        $public_fields['title'] = $public_fields['label'];
+        unset($public_fields['label']);
+
+        $public_fields['publish_date'] = array(
+            'property' => 'field_publish_date',
+            'formatter' => array(
+                'type' => 'date_plain',
+            )
+        );
+
+        $public_fields['news_author'] = array(
+            'property' => 'field_news_author'
+        );
+
+
+        $public_fields['url'] = $public_fields['path'];
+        $public_fields['url'] = array(
+            'property' => 'url',
+        );
+
+        // Expose summary
+        $public_fields['summary'] = array(
+            'property' => 'field_summary',
+            'sub_property' => 'value',
+            'process_callbacks' => array('strip_tags'),
+        );
+
+        $public_fields['lede'] = [
+            'property' => 'field_news',
+            'resource' => [
+                'name' => 'lede',
+                'fullView' => TRUE,
+                'majorVersion' => 1,
+                'minorVersion' => 0
+            ]
+        ];
+
+        $public_fields['content'] = [
+            'property' => 'field_news',
+            'resource' => [
+                'name' => 'news_content',
+                'fullView' => TRUE,
+                'majorVersion' => 1,
+                'minorVersion' => 0
+            ]
+        ];
+
+        $public_fields['featured_image'] = array(
+            'property' => 'field_hero_img',
+            'process_callbacks' => array(
+                array($this, 'imageProcess'),
+            ),
+            'image_styles' => array('thumbnail', 'medium', 'large'),
+        );
+
+        if (field_info_field('field_images')) {
+            $public_fields['images'] = array(
+                'property' => 'field_images',
+                'process_callbacks' => array(
+                    array($this, 'imageProcess'),
+                ),
+                'image_styles' => array('thumbnail', 'medium', 'large'),
+            );
+        }
+
+        $public_fields['featured_image_caption'] = array(
+            'property' => 'field_hero_image_caption'
+        );
+
+        $public_fields['hide_featured_image'] = array(
+            'property' => 'field_hide_featured_image'
+        );
+
+        $public_fields['research'] = array(
+            'property' => 'field_topics',
+            'wrapper_method' => 'getIdentifier',
+        );
+
+        $public_fields['faculty'] = array(
+            'property' => 'field_related_people',
+            'wrapper_method' => 'getIdentifier',
+        );
+
+        $public_fields['department'] = array(
+            'property' => 'field_department',
+            'wrapper_method' => 'getIdentifier',
+        );
+
+        $public_fields['center'] = array(
+            'property' => 'field_center',
+            'wrapper_method' => 'getIdentifier',
+        );
+
+
+        $public_fields['eqn'] = array(
+            'property' => 'field_eqn_reference',
+            'wrapper_method' => 'getIdentifier',
+        );
+
+        $public_fields['series'] = array(
+            'property' => 'field_series',
+            'wrapper_method' => 'getIdentifier',
+        );
 
         return $public_fields;
     }
-}
 ```
 
 <br>
 <br>
 
-### Snippet of JSON response before plugin
+### Snippet of JSON response before adding taxonomy plugin
 
 <br>
 
@@ -164,27 +252,12 @@ class News__1_2 extends News__1_1 implements ResourceInterface {
 	"publish_date": "2020-11-17 00:00:00",
 	"news_author": "Molly Sharlach",
 	"url": "https://engineering.princeton.edu/news/2020/11/17/machine-learning-guarantees-robots-performance-unknown-territory",
-	"summary": "As engineers increasingly turn to machine learning methods to develop adaptable robots, new work by Princeton University researchers makes progress on safety and performance guarantees for robots operating in novel environments with diverse types of obstacles and constraints.\n",
-	"featured_image": {
-		"id": "3109",
-		"self": "https://engineering.princeton.edu/sites/default/files/robotics-compressed.gif",
-		"filemime": "image/gif",
-		"filesize": "4833463",
-		"width": "700",
-		"height": "421",
-		"styles": {
-			"thumbnail": "https://engineering.princeton.edu/sites/default/files/styles/thumbnail/public/robotics-compressed.gif?itok=zzvlFcLY",
-			"medium": "https://engineering.princeton.edu/sites/default/files/styles/medium/public/robotics-compressed.gif?itok=UIlxFlfQ",
-			"large": "https://engineering.princeton.edu/sites/default/files/styles/large/public/robotics-compressed.gif?itok=0EOdgj4T"
-		}
-	},
-	"featured_image_caption": "Princeton researchers tested a new machine learning approach for guaranteeing robots’ safety and success in unfamiliar settings. Experiments included programming a small drone called a Parrot Swing to avoid obstacles while flying down a 60-foot-long corridor. Video by the Intelligent Robot Motion Lab; GIF by Josh Cartagena",
-	"hide_featured_image": "false"
+	"summary": "As engineers increasingly turn to machine learning methods to develop adaptable robots, new work by Princeton University researchers makes progress on safety and performance guarantees for robots operating in novel environments with diverse types of obstacles and constraints"
 }
 ```
 
 <br>
-### Snippet of JSON response after 
+### Snippet of JSON response after adding taxonomy plugin
 <br>
 <br>
 
@@ -196,22 +269,7 @@ class News__1_2 extends News__1_1 implements ResourceInterface {
 	"publish_date": "2020-11-17 00:00:00",
 	"news_author": "Molly Sharlach",
 	"url": "https://engineering.princeton.edu/news/2020/11/17/machine-learning-guarantees-robots-performance-unknown-territory",
-	"summary": "As engineers increasingly turn to machine learning methods to develop adaptable robots, new work by Princeton University researchers makes progress on safety and performance guarantees for robots operating in novel environments with diverse types of obstacles and constraints.\n",
-	"featured_image": {
-		"id": "3109",
-		"self": "https://engineering.princeton.edu/sites/default/files/robotics-compressed.gif",
-		"filemime": "image/gif",
-		"filesize": "4833463",
-		"width": "700",
-		"height": "421",
-		"styles": {
-			"thumbnail": "https://engineering.princeton.edu/sites/default/files/styles/thumbnail/public/robotics-compressed.gif?itok=zzvlFcLY",
-			"medium": "https://engineering.princeton.edu/sites/default/files/styles/medium/public/robotics-compressed.gif?itok=UIlxFlfQ",
-			"large": "https://engineering.princeton.edu/sites/default/files/styles/large/public/robotics-compressed.gif?itok=0EOdgj4T"
-		}
-	},
-	"featured_image_caption": "Princeton researchers tested a new machine learning approach for guaranteeing robots’ safety and success in unfamiliar settings. Experiments included programming a small drone called a Parrot Swing to avoid obstacles while flying down a 60-foot-long corridor. Video by the Intelligent Robot Motion Lab; GIF by Josh Cartagena",
-	"hide_featured_image": "false",
+	"summary": "As engineers increasingly turn to machine learning methods to develop adaptable robots, new work by Princeton University researchers makes progress on safety and performance guarantees for robots operating in novel environments with diverse types of obstacles and constraints.",
 	"research": [{
 			"id": "19",
 			"self": "https://engineering.princeton.edu/api/v1.0/research/19",
@@ -227,6 +285,101 @@ class News__1_2 extends News__1_1 implements ResourceInterface {
 			"url": "https://engineering.princeton.edu/research/robotics-and-cyberphysical-systems"
 		}
 	]
+}
+```
+
+<br>
+### Referencing paragraphs
+
+Use the same approach by defining a custom plugin and using the paragraphs namespace.
+
+```
+namespace Drupal\engineering_api\Plugin\resource\paragraphs;
+use Drupal\restful\Http\RequestInterface;
+use Drupal\restful\Plugin\resource\Field\ResourceFieldBase;
+use Drupal\restful\Plugin\resource\ResourceEntity;
+use Drupal\restful\Plugin\resource\ResourceInterface;
+/**
+ * Class lede__1_0
+ * @package Drupal\engineering_api\Plugin\resource\paragraphs
+ *
+ * @Resource(
+ *   name = "lede:1.0",
+ *   resource = "lede",
+ *   label = "Lede",
+ *   description = "Paragraph type: Lede",
+ *   authenticationOptional = TRUE,
+ *   dataProvider = {
+ *     "entityType": "paragraphs_item",
+ *     "bundles": {
+ *       "news_lede"
+ *     },
+ *     "sort": {
+ *       "item_id": "DESC"
+ *     },
+ *   },
+ *   majorVersion = 1,
+ *   minorVersion = 0
+ * )
+ */
+class lede__1_0 extends ResourceEntity implements ResourceInterface {
+    /**
+     * Overrides ResourceNode::publicFields().
+     */
+    protected function publicFields() {
+        $public_fields = parent::publicFields();
+
+        if (!is_null($this->getEntityType()) == 'paragraphs_item') {
+            // Fetch the lede
+            $public_fields['lede_content'] = [
+                'property' => 'field_news_content',
+            ];
+        }
+
+        return $public_fields;
+    }
+}
+```
+
+<br>
+<br>
+
+### Snippet of JSON response before adding paragraph plugin (see [/src/Plugin/resource/entity/node/news/News\_\_1_1](https://github.com/somenode/engineering_api/blob/master/src/Plugin/resource/entity/node/news/News__1_1.php) for full field list).
+
+<br>
+
+```
+{
+	"id": 8212,
+	"self": "https://engineering.princeton.edu/api/v1.2/news/8212",
+	"title": "Machine learning guarantees robots’ performance in unknown territory",
+	"publish_date": "2020-11-17 00:00:00",
+	"news_author": "Molly Sharlach",
+	"url": "https://engineering.princeton.edu/news/2020/11/17/machine-learning-guarantees-robots-performance-unknown-territory",
+	"summary": "As engineers increasingly turn to machine learning methods to develop adaptable robots, new work by Princeton University researchers makes progress on safety and performance guarantees for robots operating in novel environments with diverse types of obstacles and constraints."
+}
+```
+
+<br>
+### Snippet of JSON response after adding paragraph plugin
+<br>
+<br>
+
+```
+{
+    "id": 8212,
+	"self": "https://engineering.princeton.edu/api/v1.2/news/8212",
+	"title": "Machine learning guarantees robots’ performance in unknown territory",
+	"publish_date": "2020-11-17 00:00:00",
+	"news_author": "Molly Sharlach",
+	"url": "https://engineering.princeton.edu/news/2020/11/17/machine-learning-guarantees-robots-performance-unknown-territory",
+	"summary": "As engineers increasingly turn to machine learning methods to develop adaptable robots, new work by Princeton University researchers makes progress on safety and performance guarantees for robots operating in novel environments with diverse types of obstacles and constraints.\n",
+	"lede": [{
+		"id": "5011",
+		"label": "",
+		"self": "https://engineering.princeton.edu/api/v1.0/lede/5011",
+		"lede_content": "A small drone takes a test flight through a space filled with randomly placed cardboard cylinders acting as stand-ins for trees, people or structures. The algorithm controlling the drone has been trained on a thousand simulated obstacle-laden courses, but it’s never seen one like this. Still, nine times out of 10, the pint-sized plane dodges all the obstacles in its path."
+	}]
 }
 ```
 
